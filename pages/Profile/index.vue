@@ -83,7 +83,8 @@
 
 <script>
 export default {
-    name:'Profile'
+  middleware: "authenticated",
+  name: "Profile",
 };
 </script>
 
