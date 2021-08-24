@@ -1,14 +1,11 @@
 const cookieparser = process.server ? require("cookieparser") : undefined;
 
-export const state = () => {
-  return {
-    user: null,
-  };
-};
+export const state = () => ({
+  user: null,
+});
 
 export const mutations = {
   setUser(state, data) {
-    console.log(data);
     state.user = data;
   },
 };
@@ -23,8 +20,6 @@ export const actions = {
     if (req.headers.cookie) {
       // 使用 cookieparser 把 cookie 字符串转为 JavaScript 对象
       const parsed = cookieparser.parse(req.headers.cookie);
-      console.log(JSON.parse(parsed.user));
-
       try {
         user = JSON.parse(parsed.user);
       } catch (err) {

@@ -93,8 +93,7 @@ export default {
         //跳转到首页
         this.$router.push("/");
       } catch (err) {
-        console.dir(err);
-        this.errors = err.response.data.errors;
+        // this.errors = err.response.data.errors;
       }
     },
   },
