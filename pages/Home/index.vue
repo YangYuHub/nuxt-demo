@@ -21,48 +21,82 @@
             </ul>
           </div>
 
-          <div class="article-preview">
+          <div
+            class="article-preview"
+            v-for="article in articles"
+            :key="article.slug"
+          >
             <div class="article-meta">
-              <a href="profile.html"
-                ><img src="http://i.imgur.com/Qr71crq.jpg"
-              /></a>
+              <nuxt-link
+                :to="{
+                  name: 'profile',
+                  params: {
+                    username: article.author.username,
+                  },
+                }"
+                ><img :src="article.author.image"
+              /></nuxt-link>
               <div class="info">
-                <a href="" class="author">Eric Simons</a>
-                <span class="date">January 20th</span>
+                <nuxt-link
+                  :to="{
+                    name: 'profile',
+                    params: {
+                      username: article.author.username,
+                    },
+                  }"
+                  class="author"
+                  >{{ article.author.username }}</nuxt-link
+                >
+                <span class="date">{{ article.createdAt }}</span>
               </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 29
+              <button
+                class="btn btn-outline-primary btn-sm pull-xs-right"
+                :class="{ active: article.favorited }"
+              >
+                <i class="ion-heart"></i> {{ article.favoritesCount }}
               </button>
             </div>
-            <a href="" class="preview-link">
-              <h1>How to build webapps that scale</h1>
-              <p>This is the description for the post.</p>
+            <nuxt-link
+              :to="{
+                name: 'article',
+                params: {
+                  slug: article.slug,
+                },
+              }"
+              class="preview-link"
+            >
+              <h1>{{ article.title }}</h1>
+              <p>{{ article.description }}</p>
               <span>Read more...</span>
-            </a>
+            </nuxt-link>
           </div>
 
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href="profile.html"
-                ><img src="http://i.imgur.com/N4VcUeJ.jpg"
-              /></a>
-              <div class="info">
-                <a href="" class="author">Albert Pai</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 32
-              </button>
-            </div>
-            <a href="" class="preview-link">
-              <h1>
-                The song you won't ever stop singing. No matter how hard you
-                try.
-              </h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-            </a>
-          </div>
+          <!-- 分页列表 -->
+          <nav>
+            <ul class="pagination">
+              <li
+                class="page-item"
+                :class="{
+                  active: item === page,
+                }"
+                v-for="item in totalPage"
+                :key="item"
+              >
+                <nuxt-link
+                  class="page-link"
+                  :to="{
+                    name: 'home',
+                    query: {
+                      page: item,
+                      tag: $route.query.tag,
+                    },
+                  }"
+                  >{{ item }}</nuxt-link
+                >
+              </li>
+            </ul>
+          </nav>
+          <!-- /分页列表 -->
         </div>
 
         <div class="col-md-3">
@@ -70,14 +104,18 @@
             <p>Popular Tags</p>
 
             <div class="tag-list">
-              <a href="" class="tag-pill tag-default">programming</a>
-              <a href="" class="tag-pill tag-default">javascript</a>
-              <a href="" class="tag-pill tag-default">emberjs</a>
-              <a href="" class="tag-pill tag-default">angularjs</a>
-              <a href="" class="tag-pill tag-default">react</a>
-              <a href="" class="tag-pill tag-default">mean</a>
-              <a href="" class="tag-pill tag-default">node</a>
-              <a href="" class="tag-pill tag-default">rails</a>
+              <nuxt-link
+                :to="{
+                  name: 'home',
+                  query: {
+                    tag: item,
+                  },
+                }"
+                class="tag-pill tag-default"
+                v-for="item in tags"
+                :key="item"
+                >{{ item }}</nuxt-link
+              >
             </div>
           </div>
         </div>
@@ -87,8 +125,51 @@
 </template>
 
 <script>
+import { getArticles, getYourFeedArticles } from "@/api/article";
+import { getTags } from "@/api/tag";
 export default {
   name: "home",
+  async asyncData({ query }) {
+    const page = Number.parseInt(query.page || 1);
+    const limit = 20;
+    const tab = query.tab || "global_feed";
+    const tag = query.tag;
+
+    const loadArticles =
+      tab === "global_feed" ? getArticles : getYourFeedArticles;
+
+    const [articleRes, tagRes] = await Promise.all([
+      loadArticles({
+        limit,
+        offset: (page - 1) * limit,
+        tag,
+      }),
+      getTags(),
+    ]);
+
+    console.log(articleRes, tagRes);
+
+    const { articles, articlesCount } = articleRes.data;
+    const { tags } = tagRes.data;
+
+    articles.forEach((article) => (article.favoriteDisabled = false));
+
+    return {
+      articles, // 文章列表
+      articlesCount, // 文章总数
+      tags, // 标签列表
+      limit, // 每页大小
+      page, // 页码
+      tab, // 选项卡
+      tag, // 数据标签
+    };
+  },
+  watchQuery: ["page", "tag", "tab"],
+  computed: {
+    totalPage() {
+      return Math.ceil(this.articlesCount / this.limit);
+    },
+  },
 };
 </script>
 

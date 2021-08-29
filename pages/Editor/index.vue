@@ -51,7 +51,7 @@
 <script>
 export default {
   middleware: "authenticated",
-  name: "Editor",
+  name: "editor",
 };
 </script>
 
