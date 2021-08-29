@@ -16,7 +16,7 @@
                 <nuxt-link
                   class="nav-link"
                   :class="{
-                    active: tab === 'your_feed'
+                    active: tab === 'your_feed',
                   }"
                   exact
                   :to="{
@@ -87,7 +87,7 @@
                   class="author"
                   >{{ article.author.username }}</nuxt-link
                 >
-                <span class="date">{{ article.createdAt }}</span>
+                <span class="date">{{ article.createdAt | date('MMM DD,YYYY') }}</span>
               </div>
               <button
                 class="btn btn-outline-primary btn-sm pull-xs-right"
@@ -148,7 +148,7 @@
                 :to="{
                   name: 'home',
                   query: {
-                    tab:'tag',
+                    tab: 'tag',
                     tag: item,
                   },
                 }"
