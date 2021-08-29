@@ -43,7 +43,7 @@ export default {
               {
                 name: "article",
                 path: "/article/:slug",
-                component: resolve(__dirname, "pages/article/"),
+                component: resolve(__dirname, "pages/Article/"),
               },
             ],
           },
