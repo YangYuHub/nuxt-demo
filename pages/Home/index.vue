@@ -12,11 +12,51 @@
         <div class="col-md-9">
           <div class="feed-toggle">
             <ul class="nav nav-pills outline-active">
-              <li class="nav-item">
-                <a class="nav-link disabled" href="">Your Feed</a>
+              <li v-if="user" class="nav-item">
+                <nuxt-link
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'your_feed'
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                    query: {
+                      tab: 'your_feed',
+                    },
+                  }"
+                  >Your Feed</nuxt-link
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="">Global Feed</a>
+                <nuxt-link
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'global_feed',
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                  }"
+                  >Global Feed</nuxt-link
+                >
+              </li>
+              <li v-if="tag" class="nav-item">
+                <nuxt-link
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'global_feed',
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                    query: {
+                      tab: 'tag',
+                      tag: tag,
+                    },
+                  }"
+                  >#{{ tag }}</nuxt-link
+                >
               </li>
             </ul>
           </div>
@@ -108,6 +148,7 @@
                 :to="{
                   name: 'home',
                   query: {
+                    tab:'tag',
                     tag: item,
                   },
                 }"
@@ -127,6 +168,7 @@
 <script>
 import { getArticles, getYourFeedArticles } from "@/api/article";
 import { getTags } from "@/api/tag";
+import { mapState } from "vuex";
 export default {
   name: "home",
   async asyncData({ query }) {
@@ -139,15 +181,13 @@ export default {
       tab === "global_feed" ? getArticles : getYourFeedArticles;
 
     const [articleRes, tagRes] = await Promise.all([
-      loadArticles({
+      getArticles({
         limit,
         offset: (page - 1) * limit,
         tag,
       }),
       getTags(),
     ]);
-
-    console.log(articleRes, tagRes);
 
     const { articles, articlesCount } = articleRes.data;
     const { tags } = tagRes.data;
@@ -166,6 +206,7 @@ export default {
   },
   watchQuery: ["page", "tag", "tab"],
   computed: {
+    ...mapState(["user"]),
     totalPage() {
       return Math.ceil(this.articlesCount / this.limit);
     },
