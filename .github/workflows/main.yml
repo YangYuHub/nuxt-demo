@@ -16,9 +16,9 @@ jobs:
     # 打包构建
     - name: Build
       uses: actions/setup-node@master
-    - run: npm run install
+    - run: npm install
     - run: npm run build
-    - run: tar -zcvf release.tgz .nuxt static nuxt.config.js package.json pm2.config.json
+    - run: tar -zcvf release.tgz .nuxt static nuxt.config.js package.json package-lock.json pm2.config.json
 
     # 发布 Release
     - name: Create Release
@@ -56,5 +56,5 @@ jobs:
           cd /root/nuxt-demo
           wget https://github.com/YangYuHub/nuxt-demo/releases/latest/download/release.tgz -O release.tgz
           tar zxvf release.tgz
-          npm run install --production
+          npm install --production
           pm2 reload pm2.config.json
