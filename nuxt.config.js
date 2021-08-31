@@ -12,7 +12,7 @@ export default {
             children: [
               {
                 name: "home",
-                path: "", //默认子路由
+                path: "/home", //默认子路由
                 component: resolve(__dirname, "pages/Home/"),
               },
               {
@@ -37,7 +37,7 @@ export default {
               },
               {
                 name: "editor",
-                path: "/editor",
+                path: "",
                 component: resolve(__dirname, "pages/Editor/"),
               },
               {
